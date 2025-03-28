@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -104,5 +105,4 @@ public class Chat {
     public void setMessages(Set<Message> messages) {
         this.messages = messages;
     }
-
 }
