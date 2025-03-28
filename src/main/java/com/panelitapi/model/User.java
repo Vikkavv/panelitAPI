@@ -1,15 +1,20 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,27 +22,31 @@ public class User {
     private Long id;
 
     @Size(max = 25)
-    @NotNull
+    @NotNull(message = "Field name can not be null")
     @Column(name = "name", nullable = false, length = 25)
+    @Pattern(regexp = "[A-Za-zÑñÁÉÍÓÚÇáéíóúçÀÈÌÒÙàèìòùÂÊÎÔÛâêîôûÄËÏÖÜäëïöü]{1,}", message = "Name can not take special symbols and either numbers.")
     private String name;
 
     @Size(max = 25)
-    @NotNull
+    @NotNull(message = "Field last name can not be null")
     @Column(name = "last_name", nullable = false, length = 25)
+    @Pattern(regexp = "[A-Za-zÑñÁÉÍÓÚÇáéíóúçÀÈÌÒÙàèìòùÂÊÎÔÛâêîôûÄËÏÖÜäëïöü]{1,}", message = "Last name can not take special symbols and either numbers.")
     private String lastName;
 
     @Size(max = 20)
-    @NotNull
+    @NotNull(message = "Field nickname can not be null")
     @Column(name = "nickname", nullable = false, length = 20)
+    @Pattern(regexp = "[-A-Za-z0-9ÑñÁÉÍÓÚÇáéíóúçÀÈÌÒÙàèìòùÂÊÎÔÛâêîôûÄËÏÖÜäëïöü_/\\\\.|]{6,25}", message = "Nickname must be at least 6 characters long, include numbers, and common symbols and letters.")
     private String nickname;
 
     @Size(max = 70)
-    @NotNull
+    @NotNull(message = "Field email can not be null")
     @Column(name = "email", nullable = false, length = 70)
+    @Pattern(regexp = "[a-zA-Z0-9._]+@[a-zA-Z]+(([.][a-z]+)*)[.][a-z]{2,}", message = "Use a valid email format")
     private String email;
 
-    @Size(max = 30)
-    @NotNull
+    @Size(max = 60)
+    @NotNull(message = "Field password can not be null")
     @Column(name = "password", nullable = false, length = 30)
     private String password;
 
@@ -52,31 +61,38 @@ public class User {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "plan_id", nullable = false)
+    @JsonIgnoreProperties({"users", "hibernateLazyInitializer", "handler"})
     private Plan plan;
 
     @Column(name = "plan_expiration_date")
-    private Instant planExpirationDate;
+    private LocalDateTime planExpirationDate;
 
     @OneToMany(mappedBy = "integrant")
-    private Set<ChatIntegrant> chatIntegrants = new LinkedHashSet<>();
+    private Set<ChatIntegrant> chatsBelonged = new LinkedHashSet<>();
 
     @ManyToMany
-    private Set<User> users = new LinkedHashSet<>();
+    @JoinTable( name = "followers", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "followed_id"))
+    private Set<User> followers = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "sender")
+    @JsonIgnoreProperties({"sender", "hibernateLazyInitializer", "handler"})
     private Set<Message> messages = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnoreProperties({"owner", "hibernateLazyInitializer", "handler"})
     private Set<Note> notes = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "receiver")
+    @JsonIgnoreProperties({"receiver", "hibernateLazyInitializer", "handler"})
     private Set<Notification> notifications = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "participant")
+    @JsonIgnoreProperties({"participant", "hibernateLazyInitializer", "handler"})
     private Set<PanelParticipant> panelParticipants = new LinkedHashSet<>();
 
-    @ManyToMany
-    private Set<Panel> panels = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "subscriber")
+    @JsonIgnoreProperties({"subscriber", "hibernateLazyInitializer", "handler"})
+    private Set<PanelSubscriber> subscribedPanels = new LinkedHashSet<>();
 
     public Long getId() {
         return id;
@@ -150,28 +166,28 @@ public class User {
         this.plan = plan;
     }
 
-    public Instant getPlanExpirationDate() {
+    public LocalDateTime getPlanExpirationDate() {
         return planExpirationDate;
     }
 
-    public void setPlanExpirationDate(Instant planExpirationDate) {
+    public void setPlanExpirationDate(LocalDateTime planExpirationDate) {
         this.planExpirationDate = planExpirationDate;
     }
 
-    public Set<ChatIntegrant> getChatIntegrants() {
-        return chatIntegrants;
+    public Set<ChatIntegrant> getChatChatsBelonged() {
+        return chatsBelonged;
     }
 
-    public void setChatIntegrants(Set<ChatIntegrant> chatIntegrants) {
-        this.chatIntegrants = chatIntegrants;
+    public void setChatChatsBelonged(Set<ChatIntegrant> chatsBelonged) {
+        this.chatsBelonged = chatsBelonged;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<User> getFollows() {
+        return followers;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setFollows(Set<User> followers) {
+        this.followers = followers;
     }
 
     public Set<Message> getMessages() {
@@ -206,12 +222,27 @@ public class User {
         this.panelParticipants = panelParticipants;
     }
 
-    public Set<Panel> getPanels() {
-        return panels;
+    public Set<PanelSubscriber> getPanels() {
+        return subscribedPanels;
     }
 
-    public void setPanels(Set<Panel> panels) {
-        this.panels = panels;
+    public void setPanels(Set<PanelSubscriber> subscribedPanels) {
+        this.subscribedPanels = subscribedPanels;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
+                ", plan=" + plan +
+                ", planExpirationDate=" + planExpirationDate +
+                '}';
+    }
 }
