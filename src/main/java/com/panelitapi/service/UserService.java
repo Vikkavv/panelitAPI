@@ -23,14 +23,27 @@ public class UserService {
     private UserRepository userRepository;
     private PlanService planService;
     private AuthService authService;
+    private PanelService panelService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PlanService planService, AuthService authService) {
+    public UserService(UserRepository userRepository, PlanService planService, AuthService authService, PanelService panelService) {
         this.userRepository = userRepository;
         this.planService = planService;
         this.authService = authService;
+        this.panelService = panelService;
     }
 
+    public User getGeneralUserInfoByNickname(String nickname) {
+        User user = null;
+        try{
+            user = userRepository.findUserByNickname(nickname).orElseThrow();
+        }catch (NoSuchElementException e){
+            throw new RuntimeException("User not found");
+        }
+        user.setPassword(null);
+        user.setPhoneNumber(null);
+        return user;
+    }
 
     public Map<String, String> add(User user) {
         Map<String, String> errors = new HashMap<>();

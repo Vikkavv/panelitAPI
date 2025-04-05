@@ -1,5 +1,6 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +13,7 @@ public class PanelParticipant {
     @MapsId("participantId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "participant_id", nullable = false)
+    @JsonIgnoreProperties({"panelParticipants"})
     private User participant;
 
     @MapsId("panelId")

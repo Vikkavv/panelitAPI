@@ -1,5 +1,7 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "panel")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Panel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,9 +52,11 @@ public class Panel {
     private Set<Note> notes = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "panel")
+    @JsonIgnoreProperties({"panel"})
     private Set<PanelParticipant> panelParticipants = new LinkedHashSet<>();
 
     @ManyToMany
+    @JsonIgnore
     private Set<User> users = new LinkedHashSet<>();
 
     public Long getId() {

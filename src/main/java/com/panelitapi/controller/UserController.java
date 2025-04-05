@@ -32,6 +32,17 @@ public class UserController {
         this.sessionService = sessionService;
     }
 
+    @GetMapping("/{nickname}")
+    public ResponseEntity<User> getGeneralUserInfoByNickname(@PathVariable String nickname) {
+        User user = userService.getGeneralUserInfoByNickname(nickname);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/panelsOf/{nickname}")
+    public ResponseEntity<User> getPanelsOfUserByNickname(@PathVariable String nickname) {
+        return null;
+    }
+
     @PostMapping("/signUp")
     public ResponseEntity<Map<String, String>> addUser(@RequestBody @Valid User user, HttpServletResponse response) {
         Map<String, String> errors = userService.add(user);
