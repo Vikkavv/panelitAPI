@@ -15,4 +15,12 @@ public class CookieService {
         cookie.setPath("/");
         return cookie;
     }
+
+    public Cookie deleteSession(Cookie cookie){
+        Cookie cookieForDelete = new Cookie(cookie.getName(), cookie.getValue());
+        cookieForDelete.setHttpOnly(true);
+        cookieForDelete.setPath(cookie.getPath());
+        cookieForDelete.setMaxAge(0);
+        return cookieForDelete;
+    }
 }

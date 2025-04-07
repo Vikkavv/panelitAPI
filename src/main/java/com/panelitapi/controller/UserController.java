@@ -7,6 +7,7 @@ import com.panelitapi.service.CookieService;
 import com.panelitapi.service.SessionService;
 import com.panelitapi.service.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,21 @@ public class UserController {
             response.addCookie(cookie);
         }
         return ResponseEntity.ok(errors);
+    }
+
+    @PostMapping("/signOut")
+    public ResponseEntity<String> signOut(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        Cookie cookieSession = null;
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equalsIgnoreCase("SESSIONID")) cookieSession = cookie;
+            }
+            cookieSession.setPath("/");
+            cookieSession = cookieService.deleteSession(cookieSession);
+            response.addCookie(cookieSession);
+        }
+        return ResponseEntity.ok("");
     }
 
     @PostMapping("/signInWithCookie")
