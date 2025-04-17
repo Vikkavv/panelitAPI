@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,21 +46,59 @@ public class UserService {
         return user;
     }
 
+    public User getGeneralUserInfoById(Long id) {
+        User user = null;
+        try{
+            user = userRepository.findById(id).orElseThrow();
+        }catch (NoSuchElementException e){
+            throw new RuntimeException("User not found");
+        }
+        user.setPassword(null);
+        user.setPhoneNumber(null);
+        return user;
+    }
+
+    public boolean existsUserWithPhoneNumber(String phoneNumber) {
+        boolean exists = false;
+        Optional<User> opUser = userRepository.findUserByPhoneNumber(phoneNumber);
+        if(opUser.isPresent())
+            exists = true;
+        return exists;
+    }
+
+    public boolean existsUserWithNickname(String nickname) {
+        boolean exists = false;
+        Optional<User> opUser = userRepository.findUserByNickname(nickname);
+        if (opUser.isPresent())
+            exists = true;
+        return exists;
+    }
+
+    public boolean existsUserWithEmail(String email) {
+        boolean exists = false;
+        Optional<User> opUser = userRepository.findUserByEmail(email);
+        if (opUser.isPresent())
+            exists = true;
+        return exists;
+    }
+
+
     public Map<String, String> add(User user) {
         Map<String, String> errors = new HashMap<>();
         user.setPlan(planService.findById(user.getPlan().getId()));
         user.setPlanExpirationDate(calculatePlanExpirationDate(user.getPlan(), false));
         boolean hasErrors = false;
 
-        Pattern pattern = Pattern.compile("^[-A-Za-z0-9ÑñÇç@_.&%$,]{8,12}$");
-        Matcher matcher = pattern.matcher(user.getPassword());
-        if(!matcher.find()) throw new RuntimeException("Password has to be between 8 to 12 characters long and common letters and symbols");
+//        Pattern pattern = Pattern.compile("^[-A-Za-z0-9ÑñÇç@_.&%$,]{8,12}$");
+//        Matcher matcher = pattern.matcher(user.getPassword());
+//        if(!matcher.find()) throw new RuntimeException("Password has to be between 8 and 12 characters long and must include common letters and symbols");
 
         if(user.getPhoneNumber() != null){
             PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
             try{
                 PhoneNumber phoneNumber = phoneNumberUtil.parse(user.getPhoneNumber(), null);
                 if(!phoneNumberUtil.isValidNumber(phoneNumber)) throw new Exception();
+                user.setPhoneNumber(phoneNumberUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL));
             }catch (Exception e){
                 errors.put("phoneNumber", "If you provide a phone number, use a valid format");
                 hasErrors = true;
@@ -82,12 +121,27 @@ public class UserService {
             }
         }
         //Encrypt the password
-        user.setPassword(authService.encodePassword(user.getPassword()));
+        user.setPassword(authService.testAndEncodePassword(user.getPassword()));
         if(!hasErrors){
             userRepository.save(user);
             errors.put("errors", null);
         }
         return errors;
+    }
+
+    public void update(User user) {
+        User userPersisted = findById(user.getId());
+
+        userPersisted.setName(user.getName());
+        userPersisted.setLastName(user.getLastName());
+        userPersisted.setNickname(user.getNickname());
+        userPersisted.setPhoneNumber(user.getPhoneNumber());
+        userPersisted.setEmail(user.getEmail());
+        userPersisted.setPassword(user.getPassword().isEmpty() || user.getPassword().equals("null") ? user.getPassword() : authService.testAndEncodePassword(user.getPassword()));
+        if(user.getProfilePicture() != null) userPersisted.setProfilePicture(user.getProfilePicture());
+        System.out.println(userPersisted);
+
+        userRepository.save(userPersisted);
     }
 
     public Map<String, String> signIn(String email, String password) {
@@ -107,7 +161,11 @@ public class UserService {
         return errors;
     }
 
-    public User findUserByEmail(String email) {
+    public User findById(long id){
+        return userRepository.findById(id).orElseThrow();
+    }
+
+    public User findByEmail(String email) {
         return userRepository.findUserByEmail(email).orElseThrow();
     }
 
