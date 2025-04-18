@@ -100,6 +100,16 @@ public class UserController {
         return ResponseEntity.ok(true);
     }
 
+    @PostMapping(value = "/UpdatePlan", consumes = "multipart/form-data")
+    public ResponseEntity<Boolean> updatePlan(@RequestPart("user") String json, @RequestPart("isMonthly") String isMonthly, @CookieValue(value = "SESSIONID", defaultValue = "") String sessionId, HttpServletRequest request) throws IOException {
+        if(sessionId == null || sessionId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = mapper.treeToValue(mapper.readTree(json), User.class);
+
+        return ResponseEntity.ok(userService.updatePlan(user, isMonthly.equals("true")));
+    }
+
     @PostMapping("/signIn")
     public ResponseEntity<Map<String, String>> signIn(@RequestParam String email, @RequestParam String password, HttpServletResponse response) {
 

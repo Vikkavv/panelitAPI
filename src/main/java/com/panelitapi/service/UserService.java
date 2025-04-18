@@ -129,6 +129,13 @@ public class UserService {
         return errors;
     }
 
+    public boolean updatePlan(User user, boolean isMonthly) {
+        user.setPlan(planService.findById(user.getPlan().getId()));
+        user.setPlanExpirationDate(calculatePlanExpirationDate(user.getPlan(), isMonthly));
+        userRepository.save(user);
+        return true;
+    }
+
     public void update(User user) {
         User userPersisted = findById(user.getId());
 
@@ -137,7 +144,7 @@ public class UserService {
         userPersisted.setNickname(user.getNickname());
         userPersisted.setPhoneNumber(user.getPhoneNumber());
         userPersisted.setEmail(user.getEmail());
-        userPersisted.setPassword(user.getPassword().isEmpty() || user.getPassword().equals("null") ? user.getPassword() : authService.testAndEncodePassword(user.getPassword()));
+        userPersisted.setPassword(user.getPassword().isEmpty() || user.getPassword().equals("null") ? userPersisted.getPassword() : authService.testAndEncodePassword(user.getPassword()));
         if(user.getProfilePicture() != null) userPersisted.setProfilePicture(user.getProfilePicture());
         System.out.println(userPersisted);
 
@@ -174,7 +181,7 @@ public class UserService {
         if(plan.getId() == 1){
             expirationDate = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
         }
-        else expirationDate = isMonthly ? LocalDateTime.now().plusMonths(1) : LocalDateTime.now().plusYears(1) ;
+        else expirationDate = isMonthly ? LocalDateTime.now().plusMonths(1) : LocalDateTime.now().plusYears(1);
         return expirationDate;
     }
 }

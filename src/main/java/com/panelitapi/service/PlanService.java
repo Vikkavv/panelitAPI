@@ -21,4 +21,6 @@ public class PlanService {
     public Plan findById(Integer id) {
         return planRepository.findById(id).orElseThrow();
     }
+
+    public List<Plan> findAll() {return planRepository.findAll();}
 }
