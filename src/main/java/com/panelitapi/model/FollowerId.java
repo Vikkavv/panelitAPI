@@ -1,5 +1,6 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +34,13 @@ public class FollowerId implements java.io.Serializable {
     }
 
     public void setFollowedId(Long followedId) {
+        this.followedId = followedId;
+    }
+
+    public FollowerId() {}
+
+    public FollowerId(Long followerId, Long followedId) {
+        this.followerId = followerId;
         this.followedId = followedId;
     }
 

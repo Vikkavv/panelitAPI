@@ -1,5 +1,6 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,11 +12,13 @@ public class Follower {
     @MapsId("followerId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "follower_id", nullable = false)
+    @JsonIgnoreProperties({"followers","panelParticipants"})
     private User follower;
 
     @MapsId("followedId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "followed_id", nullable = false)
+    @JsonIgnoreProperties({"followers","panelParticipants"})
     private User followed;
 
     public FollowerId getId() {

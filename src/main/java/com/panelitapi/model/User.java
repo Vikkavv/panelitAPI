@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -72,6 +71,7 @@ public class User {
 
     @ManyToMany
     @JoinTable( name = "followers", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "followed_id"))
+    @JsonIgnore
     private Set<User> followers = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "sender")
@@ -182,11 +182,11 @@ public class User {
         this.chatsBelonged = chatsBelonged;
     }
 
-    public Set<User> getFollows() {
+    public Set<User> getFollowers() {
         return followers;
     }
 
-    public void setFollows(Set<User> followers) {
+    public void setFollowers(Set<User> followers) {
         this.followers = followers;
     }
 

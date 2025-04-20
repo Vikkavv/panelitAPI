@@ -101,7 +101,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/UpdatePlan", consumes = "multipart/form-data")
-    public ResponseEntity<Boolean> updatePlan(@RequestPart("user") String json, @RequestPart("isMonthly") String isMonthly, @CookieValue(value = "SESSIONID", defaultValue = "") String sessionId, HttpServletRequest request) throws IOException {
+    public ResponseEntity<Boolean> updatePlan(@RequestPart("user") String json, @RequestPart("isMonthly") String isMonthly, @CookieValue(value = "SESSIONID", defaultValue = "") String sessionId) throws IOException {
         if(sessionId == null || sessionId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

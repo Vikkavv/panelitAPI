@@ -19,6 +19,7 @@ public class PanelParticipant {
     @MapsId("panelId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "panel_id", nullable = false)
+    @JsonIgnoreProperties({"panelParticipants"})
     private Panel panel;
 
     @NotNull
