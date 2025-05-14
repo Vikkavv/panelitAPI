@@ -3,6 +3,7 @@ package com.panelitapi.service;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.panelitapi.exception.UniqueValueException;
+import com.panelitapi.model.Panel;
 import com.panelitapi.model.Plan;
 import com.panelitapi.model.User;
 import com.panelitapi.repository.UserRepository;
@@ -11,12 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -96,7 +92,7 @@ public class UserService {
 //        Pattern pattern = Pattern.compile("^[-A-Za-z0-9ÑñÇç@_.&%$,]{8,12}$");
 //        Matcher matcher = pattern.matcher(user.getPassword());
 //        if(!matcher.find()) throw new RuntimeException("Password has to be between 8 and 12 characters long and must include common letters and symbols");
-
+        if(user.getPhoneNumber() != null && user.getPhoneNumber().isEmpty()) user.setPhoneNumber(null);
         if(user.getPhoneNumber() != null){
             PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
             try{
@@ -115,7 +111,7 @@ public class UserService {
             try{
                 if(nextSentence == 1 && nextSentence++ > 0) userRepository.findUserByNickname(user.getNickname()).ifPresent(u -> {throw new UniqueValueException("nickname");});
                 if(nextSentence == 2 && nextSentence++ > 0) userRepository.findUserByEmail(user.getEmail()).ifPresent(u -> {throw new UniqueValueException("email");});
-                if(nextSentence == 3 && nextSentence++ > 0) userRepository.findUserByPhoneNumber(user.getPhoneNumber()).ifPresent(u -> {throw new UniqueValueException("phoneNumber");});
+                if(nextSentence == 3 && nextSentence++ > 0 && user.getPhoneNumber() != null) userRepository.findUserByPhoneNumber(user.getPhoneNumber()).ifPresent(u -> {throw new UniqueValueException("phoneNumber");});
                 if(nextSentence == 4) finish = true;
             }catch(UniqueValueException e){
                 String errorMessage = "A user with that "+ Utils.naturalizeCamelCase(e.getMessage() + " already exists");
@@ -133,14 +129,20 @@ public class UserService {
         return errors;
     }
 
+    public List<User> findUsersWhereNicknameContains(String nickname) {
+        List<User> users = userRepository.findUsersByNicknameContainingIgnoreCase(nickname);
+        return users;
+    }
+
     public boolean updatePlan(User user, boolean isMonthly) {
-        user.setPlan(planService.findById(user.getPlan().getId()));
-        user.setPlanExpirationDate(calculatePlanExpirationDate(user.getPlan(), isMonthly));
-        userRepository.save(user);
+        User userdb = findById(user.getId());
+        userdb.setPlan(planService.findById(user.getPlan().getId()));
+        userdb.setPlanExpirationDate(calculatePlanExpirationDate(user.getPlan(), isMonthly));
+        userRepository.save(userdb);
         return true;
     }
 
-    public void update(User user) {
+    public User update(User user) {
         User userPersisted = findById(user.getId());
 
         userPersisted.setName(user.getName());
@@ -148,11 +150,11 @@ public class UserService {
         userPersisted.setNickname(user.getNickname());
         userPersisted.setPhoneNumber(user.getPhoneNumber());
         userPersisted.setEmail(user.getEmail());
+        System.out.println(user.getPassword());
         userPersisted.setPassword(user.getPassword().isEmpty() || user.getPassword().equals("null") ? userPersisted.getPassword() : authService.testAndEncodePassword(user.getPassword()));
         if(user.getProfilePicture() != null) userPersisted.setProfilePicture(user.getProfilePicture());
-        System.out.println(userPersisted);
 
-        userRepository.save(userPersisted);
+        return userRepository.save(userPersisted);
     }
 
     public Map<String, String> signIn(String email, String password) {
@@ -170,6 +172,28 @@ public class UserService {
             errors.put("errors", null);
         }
         return errors;
+    }
+
+    public void checkNMaxOfPanels(User user){
+        Plan plan = planService.findById(user.getPlan().getId());
+        List<Panel> panels = panelService.getPanelsOfUser(user);
+        if(panels.size() > plan.getNMaxPanels()){
+            panels.sort(Comparator.comparing(Panel::getLastEditedDate));
+            panels = panels.subList(0, panels.size() - plan.getNMaxPanels());
+            System.out.println(panels);
+            for(Panel panel : panels){
+                panel.setIsBlocked(true);
+                panelService.updatePanel(panel);
+            }
+        }
+        else{
+            for(Panel panel : panels){
+                if(panel.getIsBlocked()){
+                    panel.setIsBlocked(false);
+                    panelService.updatePanel(panel);
+                }
+            }
+        }
     }
 
     public User findById(long id){
