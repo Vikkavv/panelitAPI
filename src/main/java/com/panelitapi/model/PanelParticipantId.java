@@ -18,6 +18,13 @@ public class PanelParticipantId implements java.io.Serializable {
     @Column(name = "panel_id", nullable = false)
     private Long panelId;
 
+    public PanelParticipantId(Long participantId, Long panelId) {
+        this.participantId = participantId;
+        this.panelId = panelId;
+    }
+
+    public PanelParticipantId() {}
+
     public Long getParticipantId() {
         return participantId;
     }

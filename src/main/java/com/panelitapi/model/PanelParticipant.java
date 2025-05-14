@@ -30,6 +30,16 @@ public class PanelParticipant {
     @Column(name = "is_Admin", nullable = false)
     private Boolean isAdmin = false;
 
+    public PanelParticipant(PanelParticipantId id, User participant, Panel panel, Boolean isCreator, Boolean isAdmin) {
+        this.id = id;
+        this.participant = participant;
+        this.panel = panel;
+        this.isCreator = isCreator;
+        this.isAdmin = isAdmin;
+    }
+
+    public PanelParticipant() {}
+
     public PanelParticipantId getId() {
         return id;
     }

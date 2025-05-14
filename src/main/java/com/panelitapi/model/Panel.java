@@ -44,6 +44,10 @@ public class Panel {
     @Column(name = "background_photo")
     private String backgroundPhoto;
 
+    @NotNull
+    @Column(name= "is_blocked")
+    private Boolean isBlocked;
+
     @Lob
     @Column(name = "additional_info")
     private String additionalInfo;
@@ -55,7 +59,7 @@ public class Panel {
     @JsonIgnoreProperties({"panel"})
     private Set<PanelParticipant> panelParticipants = new LinkedHashSet<>();
 
-    @ManyToMany
+    @Transient
     @JsonIgnore
     private Set<User> users = new LinkedHashSet<>();
 
@@ -113,6 +117,14 @@ public class Panel {
 
     public void setBackgroundPhoto(String backgroundPhoto) {
         this.backgroundPhoto = backgroundPhoto;
+    }
+
+    public Boolean getIsBlocked() {
+        return isBlocked;
+    }
+
+    public void setIsBlocked(Boolean isBlocked) {
+        this.isBlocked = isBlocked;
     }
 
     public String getAdditionalInfo() {
