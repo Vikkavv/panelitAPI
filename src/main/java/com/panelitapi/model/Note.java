@@ -1,5 +1,6 @@
 package com.panelitapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,10 +17,12 @@ public class Note {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "panel_id")
+    @JsonIgnoreProperties({"notes","panelParticipants"})
     private Panel panel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
+    @JsonIgnoreProperties({"notes","panelParticipants"})
     private User owner;
 
     @Size(max = 40)
@@ -39,7 +42,6 @@ public class Note {
     @Column(name = "resource_url")
     private String resourceUrl;
 
-    @NotNull
     @Column(name = "last_edited_date", nullable = false)
     private LocalDate lastEditedDate;
 

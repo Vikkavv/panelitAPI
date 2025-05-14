@@ -1,6 +1,5 @@
 package com.panelitapi.controller;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.panelitapi.model.User;
 import com.panelitapi.service.*;
@@ -15,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,17 +26,19 @@ public class UserController {
     UserService userService;
     CookieService cookieService;
     SessionService sessionService;
-    ImageStorageService imageStorageService;
+    FileStorageService fileStorageService;
+    PlanService planService;
     AuthService authService;
     ObjectMapper mapper;
 
     @Autowired
-    public UserController(UserService userService, CookieService cookieService, SessionService sessionService, ImageStorageService imageStorageService, AuthService authService, ObjectMapper mapper) {
+    public UserController(UserService userService, CookieService cookieService, SessionService sessionService, FileStorageService fileStorageService, AuthService authService, PlanService planService, ObjectMapper mapper) {
         this.userService = userService;
         this.cookieService = cookieService;
         this.sessionService = sessionService;
-        this.imageStorageService = imageStorageService;
+        this.fileStorageService = fileStorageService;
         this.authService = authService;
+        this.planService = planService;
         this.mapper = mapper;
     }
 
@@ -91,8 +95,8 @@ public class UserController {
 
         //Image
         if(image != null) {
-            String imageName = imageStorageService.save(image);
-            user.setProfilePicture(imageStorageService.getUrl(imageName,request));
+            String imageName = fileStorageService.saveUserImage(image);
+            user.setProfilePicture(fileStorageService.getUserImgUrl(imageName,request));
         }
         else user.setProfilePicture(null);
 
@@ -111,16 +115,21 @@ public class UserController {
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<Map<String, String>> signIn(@RequestParam String email, @RequestParam String password, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> signIn(@RequestParam String email, @RequestParam String password, @RequestParam Boolean rememberMe, HttpServletResponse response) {
 
         Map<String, String> errors = userService.signIn(email, password);
         if(errors.containsKey("errors") && errors.get("errors") == null){
             User user = userService.findByEmail(email);
-            Cookie cookie = cookieService.createSessionCookie();
+            Cookie cookie = cookieService.createSessionCookie(rememberMe);
             sessionService.update(cookie.getValue(), user);
             response.addCookie(cookie);
         }
         return ResponseEntity.ok(errors);
+    }
+
+    @PostMapping("/findByContainingNickname")
+    public ResponseEntity<List<User>> findByContainingNickname(@RequestParam String nickname) {
+        return ResponseEntity.ok(userService.findUsersWhereNicknameContains(nickname));
     }
 
     @PostMapping("/signOut")
@@ -145,6 +154,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         user = sessionService.findById(sessionId).getUser();
+        if(LocalDateTime.now().isAfter(user.getPlanExpirationDate())){
+            user.setPlan(planService.findById(1));
+            userService.updatePlan(user, false);
+        }
+        userService.checkNMaxOfPanels(user);
         user.setPassword(null);
         return ResponseEntity.ok(user);
     }
