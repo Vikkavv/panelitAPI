@@ -34,6 +34,22 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public List<User> find100(){
+        Set<User> uniqueUsers = new HashSet<>();
+        Random rand = new Random();
+        long nUsers = userRepository.count();
+        long lastId = userRepository.getLastUserId();
+        for (int i = 0; i < 100; i++) {
+            if(uniqueUsers.size() == nUsers) break;
+            long randomLong = rand.nextLong(lastId) + 1;
+            User user = userRepository.findById(randomLong).orElse(null);
+            uniqueUsers.add(user);
+        }
+        List<User> users = new ArrayList<>(uniqueUsers);
+        Collections.shuffle(users);
+        return users;
+    }
+
     public User getGeneralUserInfoByNickname(String nickname) {
         User user = null;
         try{
@@ -177,7 +193,7 @@ public class UserService {
     public void checkNMaxOfPanels(User user){
         Plan plan = planService.findById(user.getPlan().getId());
         List<Panel> panels = panelService.getPanelsOfUser(user);
-        if(panels.size() > plan.getNMaxPanels()){
+        if(panels.size() > plan.getNMaxPanels() && (panels.size() - panels.stream().filter((Panel::getIsBlocked)).count()) > plan.getNMaxPanels()){
             panels.sort(Comparator.comparing(Panel::getLastEditedDate));
             panels = panels.subList(0, panels.size() - plan.getNMaxPanels());
             System.out.println(panels);
@@ -187,10 +203,12 @@ public class UserService {
             }
         }
         else{
-            for(Panel panel : panels){
-                if(panel.getIsBlocked()){
-                    panel.setIsBlocked(false);
-                    panelService.updatePanel(panel);
+            if((panels.size() - panels.stream().filter((Panel::getIsBlocked)).count()) < plan.getNMaxPanels()){
+                for (Panel panel : panels) {
+                    if (panel.getIsBlocked()) {
+                        panel.setIsBlocked(false);
+                        panelService.updatePanel(panel);
+                    }
                 }
             }
         }

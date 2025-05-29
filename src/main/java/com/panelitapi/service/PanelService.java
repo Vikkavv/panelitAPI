@@ -12,8 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PanelService {
@@ -29,6 +28,26 @@ public class PanelService {
         this.panelParticipantService = panelParticipantService;
         this.noteRepository = noteRepository;
         this.imageStorageService = fileStorageService;
+    }
+
+    public List<Panel> find100(){
+        Set<Panel> panels = new HashSet<>();
+        Random rand = new Random();
+        long nPanels = panelRepository.count();
+        long lastId = panelRepository.getLastPanelId();
+        for (int i = 0; i < 100; i++) {
+            if(panels.size() == nPanels) break;
+            long randomLong = rand.nextLong(lastId) + 1;
+            Panel panel = panelRepository.findById(randomLong).orElse(null);
+            if(panel != null) panels.add(panel);
+        }
+        List<Panel> panelsList = new ArrayList<>(panels);
+        Collections.shuffle(panelsList);
+        return panelsList;
+    }
+
+    public List<Panel> findAll(){
+        return panelRepository.findAll();
     }
 
     public Panel findById(Long id){

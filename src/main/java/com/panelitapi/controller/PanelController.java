@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/Panel")
@@ -32,6 +34,16 @@ public class PanelController {
     public ResponseEntity<List<Panel>> getPanelsOfUser(@PathVariable String nickname) {
         User user = userService.getGeneralUserInfoByNickname(nickname);
         return ResponseEntity.ok(panelService.getPanelsOfUser(user));
+    }
+
+    @GetMapping("/find100")
+    public ResponseEntity<List<Panel>> find100() {
+        return ResponseEntity.ok(panelService.find100());
+    }
+
+    @GetMapping("/findAll")
+    public ResponseEntity<List<Panel>> findAll() {
+        return ResponseEntity.ok(panelService.findAll());
     }
 
     @GetMapping("/findById/{id}")

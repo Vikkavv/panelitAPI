@@ -54,6 +54,11 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/find100")
+    public ResponseEntity<List<User>> find100(){
+        return ResponseEntity.ok(userService.find100());
+    }
+
     @GetMapping("/existsUserWithPhoneNumber/{phoneNumber}")
     public ResponseEntity<Boolean> existsUserWithPhoneNumber(@PathVariable String phoneNumber) {
         return ResponseEntity.ok(userService.existsUserWithPhoneNumber(phoneNumber));

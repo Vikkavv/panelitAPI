@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -159,4 +160,14 @@ public class Panel {
         this.users = users;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Panel panel)) return false;
+        return Objects.equals(id, panel.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
