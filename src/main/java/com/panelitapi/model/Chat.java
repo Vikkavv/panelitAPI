@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
