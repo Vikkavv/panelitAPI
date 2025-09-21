@@ -27,8 +27,12 @@ public class SessionService {
     public void update(String uuid, User user) {
         session = sessionRepository.findSessionByUser(user).orElseThrow();
         sessionRepository.delete(session);
-        session.setUuid(uuid);
-        sessionRepository.save(session);
+
+        // We create a new session to prevent hibernate persistant issues
+        Session sessionToSave = new Session();
+        sessionToSave.setUser(user);
+        sessionToSave.setUuid(uuid);
+        sessionRepository.save(sessionToSave);
     }
 
     public Session findById(String uuid) {
