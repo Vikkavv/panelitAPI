@@ -1,7 +1,7 @@
 # =========================
 # 1) Compilation fase
 # =========================
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 # Create app work directory
 WORKDIR /app
@@ -17,7 +17,7 @@ RUN mvn clean package -DskipTests
 # =========================
 # 2) Execution fase
 # =========================
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:21-jdk-jammy
 
 # Work directory
 WORKDIR /app
