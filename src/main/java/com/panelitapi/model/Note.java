@@ -45,7 +45,6 @@ public class Note {
     @Column(name = "last_edited_date", nullable = false)
     private LocalDate lastEditedDate;
 
-    @Lob
     @Column(name = "additional_info")
     private String additionalInfo;
 

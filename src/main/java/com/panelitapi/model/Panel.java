@@ -49,7 +49,6 @@ public class Panel {
     @Column(name= "is_blocked")
     private Boolean isBlocked;
 
-    @Lob
     @Column(name = "additional_info")
     private String additionalInfo;
 
