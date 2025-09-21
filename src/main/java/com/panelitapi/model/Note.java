@@ -34,11 +34,9 @@ public class Note {
     @Column(name = "content_type", nullable = false, length = 10)
     private String contentType;
 
-    @Lob
     @Column(name = "body_text")
     private String bodyText;
 
-    @Lob
     @Column(name = "resource_url")
     private String resourceUrl;
 

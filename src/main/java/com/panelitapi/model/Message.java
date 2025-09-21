@@ -31,15 +31,12 @@ public class Message {
     @Column(name = "mime", nullable = false, length = 10)
     private String mime;
 
-    @Lob
     @Column(name = "content")
     private String content;
 
-    @Lob
     @Column(name = "file")
     private String file;
 
-    @Lob
     @Column(name = "read_by")
     private String readBy;
 

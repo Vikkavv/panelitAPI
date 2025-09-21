@@ -29,7 +29,6 @@ public class Notification {
     @Column(name = "content", nullable = false, length = 40)
     private String content;
 
-    @Lob
     @Column(name = "image")
     private String image;
 
@@ -37,7 +36,6 @@ public class Notification {
     @Column(name = "send_date", nullable = false)
     private LocalDate sendDate;
 
-    @Lob
     @Column(name = "url")
     private String url;
 

@@ -37,11 +37,9 @@ public class Panel {
     @Column(name = "last_edited_date", nullable = false)
     private LocalDate lastEditedDate;
 
-    @Lob
     @Column(name = "cover_photo")
     private String coverPhoto;
 
-    @Lob
     @Column(name = "background_photo")
     private String backgroundPhoto;
 

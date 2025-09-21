@@ -21,11 +21,9 @@ public class Chat {
     @Column(name = "name", nullable = false, length = 40)
     private String name;
 
-    @Lob
     @Column(name = "description")
     private String description;
 
-    @Lob
     @Column(name = "image")
     private String image;
 

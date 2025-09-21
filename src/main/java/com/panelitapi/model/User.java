@@ -54,7 +54,6 @@ public class User {
     @Column(name = "phone_Number", length = 20)
     private String phoneNumber;
 
-    @Lob
     @Column(name = "profile_picture")
     private String profilePicture;
 
