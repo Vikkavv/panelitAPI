@@ -50,7 +50,7 @@ public class Panel {
     private Boolean isBlocked;
 
     @Lob
-    @Column(name = "additional_info")
+    @Column(name = "additional_info", columnDefinition = "jsonb")
     private String additionalInfo;
 
     @OneToMany(mappedBy = "panel")

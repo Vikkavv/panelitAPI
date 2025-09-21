@@ -46,7 +46,7 @@ public class Note {
     private LocalDate lastEditedDate;
 
     @Lob
-    @Column(name = "additional_info")
+    @Column(name = "additional_info", columnDefinition = "jsonb")
     private String additionalInfo;
 
     public Long getId() {
