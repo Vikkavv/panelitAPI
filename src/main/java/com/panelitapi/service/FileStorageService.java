@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService {
-    public static final String STR_ROOT_PATH = "C:/Users/victo/OneDrive/Escritorio/TFG/Panelit/BackEnd/resources/";
+    public static final String STR_ROOT_PATH = "/app/";
     public static final String STR_PATH_USER_IMAGES_LOCATION = STR_ROOT_PATH+"images/users";
     public static final String STR_PATH_PANEL_IMAGES_LOCATION = STR_ROOT_PATH+"images/panels";
     public static final String STR_PATH_DOCUMENTS_LOCATION = STR_ROOT_PATH+"documents";
