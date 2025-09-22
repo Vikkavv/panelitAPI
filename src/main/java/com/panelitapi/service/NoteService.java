@@ -18,13 +18,15 @@ public class NoteService {
     UserService userService;
     PanelService panelService;
     FileStorageService fileStorageService;
+    CloudinaryService cloudinaryService;
 
     @Autowired
-    public NoteService(NoteRepository noteRepository, UserService userService, PanelService panelService, FileStorageService fileStorageService) {
+    public NoteService(NoteRepository noteRepository, UserService userService, PanelService panelService, FileStorageService fileStorageService, CloudinaryService cloudinaryService) {
         this.noteRepository = noteRepository;
         this.userService = userService;
         this.panelService = panelService;
         this.fileStorageService = fileStorageService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     public Note findById(Long id){
@@ -44,8 +46,11 @@ public class NoteService {
         note.setOwner(userService.findById(note.getOwner().getId()));
         note.setPanel(panelService.findById(note.getPanel().getId()));
         note.setLastEditedDate(LocalDate.now());
-        String fileName = fileStorageService.savePdfFile(pdf);
-        note.setResourceUrl(fileStorageService.getDocumentUrl(fileName, request));
+
+        String fileName = cloudinaryService.uploadFile(pdf, "documents");
+        note.setResourceUrl(fileName);
+        // String fileName = fileStorageService.savePdfFile(pdf);
+        // note.setResourceUrl(fileStorageService.getDocumentUrl(fileName, request));
         return noteRepository.save(note).getId();
     }
 

@@ -21,13 +21,15 @@ public class PanelService {
     private PanelParticipantService panelParticipantService;
     private NoteRepository noteRepository;
     private FileStorageService imageStorageService;
+    private CloudinaryService cloudinaryService;
 
     @Autowired
-    public PanelService(PanelRepository panelRepository, PanelParticipantService panelParticipantService, NoteRepository noteRepository ,FileStorageService fileStorageService) {
+    public PanelService(PanelRepository panelRepository, PanelParticipantService panelParticipantService, NoteRepository noteRepository ,FileStorageService fileStorageService, CloudinaryService cloudinaryService) {
         this.panelRepository = panelRepository;
         this.panelParticipantService = panelParticipantService;
         this.noteRepository = noteRepository;
         this.imageStorageService = fileStorageService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     public List<Panel> find100(){
@@ -73,12 +75,16 @@ public class PanelService {
         panel.setAdditionalInfo(json);
 
         if(coverPhoto != null) {
-            String imageName = imageStorageService.savePanelImage(coverPhoto);
-            panel.setCoverPhoto(imageStorageService.getPanelImgUrl(imageName,request));
+            String imageName = cloudinaryService.uploadFile(coverPhoto, "panels");
+            panel.setCoverPhoto(imageName);
+            // String imageName = imageStorageService.savePanelImage(coverPhoto);
+            // panel.setCoverPhoto(imageStorageService.getPanelImgUrl(imageName,request));
         }
         if(backgroundPhoto != null) {
-            String imageName = imageStorageService.savePanelImage(backgroundPhoto);
-            panel.setBackgroundPhoto(imageStorageService.getPanelImgUrl(imageName,request));
+            String imageName = cloudinaryService.uploadFile(backgroundPhoto, "panels");
+            panel.setCoverPhoto(imageName);
+            // String imageName = imageStorageService.savePanelImage(backgroundPhoto);
+            // panel.setBackgroundPhoto(imageStorageService.getPanelImgUrl(imageName,request));
         }
         panel = panelRepository.save(panel);
         panelParticipantService.addPanelParticipant(creator, panel,true,true);

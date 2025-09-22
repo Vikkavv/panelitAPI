@@ -29,9 +29,10 @@ public class UserController {
     PlanService planService;
     AuthService authService;
     ObjectMapper mapper;
+    CloudinaryService cloudinaryService;
 
     @Autowired
-    public UserController(UserService userService, CookieService cookieService, SessionService sessionService, FileStorageService fileStorageService, AuthService authService, PlanService planService, ObjectMapper mapper) {
+    public UserController(UserService userService, CookieService cookieService, SessionService sessionService, FileStorageService fileStorageService, AuthService authService, PlanService planService, ObjectMapper mapper, CloudinaryService cloudinaryService) {
         this.userService = userService;
         this.cookieService = cookieService;
         this.sessionService = sessionService;
@@ -39,6 +40,7 @@ public class UserController {
         this.authService = authService;
         this.planService = planService;
         this.mapper = mapper;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping("/findByNickname/{nickname}")
@@ -99,8 +101,10 @@ public class UserController {
 
         //Image
         if(image != null) {
-            String imageName = fileStorageService.saveUserImage(image);
-            user.setProfilePicture(fileStorageService.getUserImgUrl(imageName,request));
+            String imageName = cloudinaryService.uploadFile(image, "users");
+            user.setProfilePicture(imageName);
+            // String imageName = fileStorageService.saveUserImage(image);
+            // user.setProfilePicture(fileStorageService.getUserImgUrl(imageName,request));
         }
         else user.setProfilePicture(null);
 
