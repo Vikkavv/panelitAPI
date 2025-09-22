@@ -23,7 +23,7 @@ public class CloudinaryService {
         Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), 
             ObjectUtils.asMap(
                 "folder", folder,
-                "resource_type", "auto"
+                "resource_type", folder.equals("documents") ? "raw" : "auto"
             )
         );
 
