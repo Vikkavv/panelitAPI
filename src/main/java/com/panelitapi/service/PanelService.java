@@ -82,7 +82,7 @@ public class PanelService {
         }
         if(backgroundPhoto != null) {
             String imageName = cloudinaryService.uploadFile(backgroundPhoto, "panels");
-            panel.setCoverPhoto(imageName);
+            panel.setBackgroundPhoto(imageName);
             // String imageName = imageStorageService.savePanelImage(backgroundPhoto);
             // panel.setBackgroundPhoto(imageStorageService.getPanelImgUrl(imageName,request));
         }
